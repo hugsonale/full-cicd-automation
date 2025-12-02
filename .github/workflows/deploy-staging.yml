@@ -9,14 +9,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: SSH into staging server and deploy
+    - name: Deploy to Staging Server
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.STAGING_HOST }}
         username: ${{ secrets.STAGING_USER }}
         key: ${{ secrets.STAGING_SSH_KEY }}
         script: |
-          docker pull ${{ secrets.REGISTRY_USERNAME }}/myapp:${{ github.sha }}
-          docker stop myapp || true
-          docker rm myapp || true
-          docker run -d -p 3000:3000 --name myapp ${{ secrets.REGISTRY_USERNAME }}/myapp:${{ github.sha }}
+          docker pull ${{ secrets.REGISTRY_USERNAME }}/python-cicd:${{ github.sha }}
+          docker stop pythonapp || true
+          docker rm pythonapp || true
+          docker run -d -p 3000:3000 --name pythonapp ${{ secrets.REGISTRY_USERNAME }}/python-cicd:${{ github.sha }}

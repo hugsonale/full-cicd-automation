@@ -1,11 +1,8 @@
-FROM node:18 AS builder
+FROM python:3.10-slim AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-FROM node:18-alpine
-WORKDIR /app
-COPY --from=builder /app .
-CMD ["npm", "start"]
+COPY . .
+
+CMD ["python", "app/main.py"]
