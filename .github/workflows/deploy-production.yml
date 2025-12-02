@@ -1,0 +1,28 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:   # Manual trigger
+
+jobs:
+  approval:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Require approval
+      run: echo "Waiting for manual approval"
+
+  deploy:
+    needs: approval
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: SSH into production server and deploy
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: ${{ secrets.PROD_USER }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        script: |
+          docker pull ${{ secrets.REGISTRY_USERNAME }}/myapp:${{ github.sha }}
+          docker stop myapp || true
+          docker rm myapp || true
+          docker run -d -p 3000:3000 --name myapp ${{ secrets.REGISTRY_USERNAME }}/myapp:${{ github.sha }}
